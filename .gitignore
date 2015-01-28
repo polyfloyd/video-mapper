@@ -1,0 +1,24 @@
+# Output directories
+/obj/*
+/bin/*
+/lib/*
+/dep/*
+/doc/*
+
+# Local makefile settings
+Makefile.local
+
+# Local Vim settings
+.vimrc
+
+# Local backup and swap files
+*~
+*.swp
+
+# Vim ctags
+/tags
+
+# Eclipse directories
+/.settings
+/.cproject
+/.project
