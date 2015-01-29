@@ -7,6 +7,13 @@
 #include "common.hh"
 #include "object.hh"
 
+const float ZFAR  = 640.0f;
+const float ZNEAR = 1.0f;
+
+void glVertexVec3(const glm::vec3 &vec) {
+	glVertex3f(vec.x, vec.y, vec.z);
+};
+
 int main(int argc, char **argv) {
 	glfwSetErrorCallback([](int code, const char *message) {
 		fatalf("GLFW: %s (%i)", message, code);
@@ -72,7 +79,7 @@ int main(int argc, char **argv) {
 	glMatrixMode(GL_PROJECTION);
 	float ratio = (float)vidmode->width / (float)vidmode->height;
 	glLoadIdentity();
-	glOrtho(-ratio * 2, ratio * 2, -2, 2, 1.0f, 640.0f);
+	glOrtho(-ratio, ratio, -1, 1, ZNEAR, ZFAR);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -84,7 +91,8 @@ int main(int argc, char **argv) {
 	glm::mat4 projection = glm::mat4(1.0f);
 	glm::mat4 mvp = projection * view * model;
 
-	Cube cube(1.0f);
+	Cube cube1(1.0f);
+	Cube cube2(1.0f);
 	Material colors[6];
 	for (int i = 0; i < 6; i++) {
 		colors[i].color = glm::vec3(
@@ -92,30 +100,77 @@ int main(int argc, char **argv) {
 			(i + 1) & 0x2 ? 1.0f : 0.0f,
 			(i + 1) & 0x4 ? 1.0f : 0.0f
 		);
-		cube.getFaces()[i * 2].mat = cube.getFaces()[i * 2 + 1].mat = &colors[i];
+		cube1.getFaces()[i * 2].mat = cube1.getFaces()[i * 2 + 1].mat = &colors[i];
+		cube2.getFaces()[i * 2].mat = cube2.getFaces()[i * 2 + 1].mat = &colors[i];
 	}
 
-	for (auto &vert : *cube.getVertices()) {
-		vert = (mvp * glm::vec4(vert, 1)).xyz();
+	std::list<Shape*> shapes;
+	shapes.push_back(&cube1);
+//	shapes.push_back(&cube2);
+
+	for (auto &shape : shapes) {
+		for (auto &vert : *shape->getVertices()) {
+			vert = (mvp * glm::vec4(vert, 1)).xyz();
+		}
 	}
+
+	glm::vec3 *draggedVertex = nullptr;
+	bool wireframe         = false;
+	bool wireframeDebounce = false;
 
 	while (!glfwWindowShouldClose(window)) {
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			if (!wireframeDebounce) {
+				wireframe = !wireframe;
+				glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
+				wireframeDebounce = true;
+			}
+		}
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE) {
+			wireframeDebounce = false;
+		}
+
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
+			int windowWidth, windowHeight;
+			double cursorPosX, cursorPosY;
+			glfwGetWindowSize(window, &windowWidth, &windowHeight);
+			glfwGetCursorPos(window, &cursorPosX, &cursorPosY);
+			glm::vec2 cursor(
+				(cursorPosX / windowWidth  * 2 - 1) * ratio,
+				-(cursorPosY / windowHeight * 2 - 1)
+			);
+			if (!draggedVertex) {
+				for (auto &shape : shapes) {
+					for (auto &vert : *shape->getVertices()) {
+						if (glm::distance(cursor, vert.xy()) < 0.1f) {
+							draggedVertex = &vert;
+							break;
+						}
+					}
+				}
+			} else {
+				draggedVertex->x = cursor.x;
+				draggedVertex->y = cursor.y;
+			}
+		} else {
+			draggedVertex = nullptr;
+		}
+
 		int fbWidth, fbHeight;
 		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 		glViewport(0, 0, fbWidth, fbHeight);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		glBegin(GL_TRIANGLES);
-		auto glVertexVec3 = [](const glm::vec3 &vec) {
-			glVertex3f(vec.x, vec.y, vec.z);
-		};
-		for (auto &face : cube.getFaces()) {
-			if (face.mat) {
-				glColor3f(face.mat->color[0], face.mat->color[1], face.mat->color[2]);
+		for (auto &shape : shapes) {
+			for (auto &face : shape->getFaces()) {
+				if (face.mat) {
+					glColor3f(face.mat->color[0], face.mat->color[1], face.mat->color[2]);
+				}
+				glVertexVec3(*face.v[0]);
+				glVertexVec3(*face.v[1]);
+				glVertexVec3(*face.v[2]);
 			}
-			glVertexVec3(*face.v[0]);
-			glVertexVec3(*face.v[1]);
-			glVertexVec3(*face.v[2]);
 		}
 		glEnd();
 
