@@ -67,6 +67,7 @@ CXXWARNINGS := \
 LDLIBS := \
 	GL \
 	GLEW \
+	X11 \
 	glfw \
 	pthread
 
