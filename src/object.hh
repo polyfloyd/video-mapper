@@ -1,21 +1,26 @@
 #ifndef _OBJECT_HH
 #define _OBJECT_HH
 
-#include "common.hh"
 #include <glm/glm.hpp>
-
-class Material {
-public:
-	glm::vec3 color;
-};
-
+#include "common.hh"
+#include "material.hh"
 
 class Shape {
 public:
+	class Vertex {
+	public:
+		glm::vec3 *vec;
+		glm::vec3  normal;
+		glm::vec2  tex;
+
+	public:
+		Vertex(glm::vec3 *vec);
+	};
+
 	class Face {
 	public:
-		Material  *mat  = nullptr;
-		glm::vec3 *v[3] = { nullptr, nullptr, nullptr };
+		Material *mat = nullptr;
+		Vertex   v[3] = { nullptr, nullptr, nullptr };
 
 	public:
 		Face(glm::vec3 *a, glm::vec3 *b, glm::vec3 *c);

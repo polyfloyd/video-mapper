@@ -167,9 +167,9 @@ int main(int argc, char **argv) {
 				if (face.mat) {
 					glColor3f(face.mat->color[0], face.mat->color[1], face.mat->color[2]);
 				}
-				glVertexVec3(*face.v[0]);
-				glVertexVec3(*face.v[1]);
-				glVertexVec3(*face.v[2]);
+				glVertexVec3(*face.v[0].vec);
+				glVertexVec3(*face.v[1].vec);
+				glVertexVec3(*face.v[2].vec);
 			}
 		}
 		glEnd();
