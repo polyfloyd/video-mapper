@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "common.hh"
-#include "object.hh"
+#include "shape.hh"
 
 const float ZFAR  = 640.0f;
 const float ZNEAR = 1.0f;

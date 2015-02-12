@@ -1,5 +1,5 @@
-#ifndef _OBJECT_HH
-#define _OBJECT_HH
+#ifndef _SHAPE_HH
+#define _SHAPE_HH
 
 #include <glm/glm.hpp>
 #include "common.hh"
@@ -52,4 +52,4 @@ public:
 	}
 };
 
-#endif /* _OBJECT_HH */
+#endif /* _SHAPE_HH */

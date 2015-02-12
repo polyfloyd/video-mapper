@@ -1,4 +1,4 @@
-#include "object.hh"
+#include "shape.hh"
 
 Shape::Vertex::Vertex(glm::vec3 *vec) {
 	this->vec = vec;
