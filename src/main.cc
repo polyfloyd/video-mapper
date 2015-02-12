@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 			monitor = monitors[pick - 1];
 		}
 	}
-	logf("Using monitor \"%s\"\n", glfwGetMonitorName(monitor));
+	debugf("Using monitor \"%s\"", glfwGetMonitorName(monitor));
 
 	const GLFWvidmode *vidmode = glfwGetVideoMode(monitor);
 	GLFWwindow *window = glfwCreateWindow(vidmode->width, vidmode->height, "Projection", monitor, nullptr);
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 			}
 		}, nullptr);
 	} else {
-		logf("GL_ARB_debug_output is not available");
+		debugf("GL_ARB_debug_output is not available");
 	}
 
 	glEnable(GL_DEPTH_TEST);

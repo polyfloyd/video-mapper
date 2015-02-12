@@ -23,16 +23,9 @@
 #include <vector>
 
 #ifdef _RELEASE
-	#define logf(...)
 	#define debugf(...)
 	#define warnf(...)
 #else
-	#define logf(...) {\
-		fprintf(stderr, "[log] ");\
-		fprintf(stderr, __VA_ARGS__);\
-		fprintf(stderr, "\n");\
-	}
-
 	#define debugf(...) {\
 		fprintf(stderr, "\x1B[32m[debug]\x1B[37m %s:%d: ", __FILE__, __LINE__);\
 		fprintf(stderr, __VA_ARGS__);\
