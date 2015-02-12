@@ -57,16 +57,21 @@ int main(int argc, char **argv) {
 	if (GLEW_ARB_debug_output) {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
-		glDebugMessageCallbackARB([](GLenum src, GLenum type, GLuint id, GLenum sev, GLsizei len, const GLchar* msg, GLvoid* userp) {
+		glDebugMessageCallbackARB([](GLenum src, GLenum type, GLuint id, GLenum sev, GLsizei len, const GLchar* cmsg, GLvoid* userp) {
+			std::string msg(cmsg);
+			if (msg[len - 1] == '\n') {
+				msg = msg.substr(0, len - 1);
+			}
+
 			switch (sev) {
 			case GL_DEBUG_SEVERITY_HIGH_ARB:
-				fatalf("OpenGL: %s", msg);
+				fatalf("OpenGL: %s", msg.c_str());
 				break;
 			case GL_DEBUG_SEVERITY_MEDIUM_ARB:
-				warnf("OpenGL: %s", msg);
+				warnf("OpenGL: %s", msg.c_str());
 				break;
 			case GL_DEBUG_SEVERITY_LOW_ARB:
-				debugf("OpenGL: %s", msg);
+				debugf("OpenGL: %s", msg.c_str());
 				break;
 			}
 		}, nullptr);
