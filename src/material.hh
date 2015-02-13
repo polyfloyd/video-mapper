@@ -8,9 +8,9 @@ class Material {
 public:
 	class Texture {
 	public:
-		static std::unique_ptr<Material::Texture> load(std::string src);
+		static std::shared_ptr<Material::Texture> fromImage(const std::string &src);
 
-		virtual ~Texture() {};
+		virtual ~Texture() = default;
 
 		virtual int getWidth() const = 0;
 
@@ -22,7 +22,7 @@ public:
 public:
 	glm::vec3                color;
 	glm::mat3                rotation;
-	std::unique_ptr<Texture> tex = nullptr;
+	std::shared_ptr<Texture> tex = nullptr;
 };
 
 #endif /* _MATERIAL_HH */

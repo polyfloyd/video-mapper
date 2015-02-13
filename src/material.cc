@@ -6,6 +6,8 @@ public:
 	cimg_library::CImg<float> img;
 
 public:
+	CImgTexture(const std::string &src) : img(src.c_str()) {};
+
 	int getWidth() const {
 		return img.width();
 	};
@@ -20,8 +22,6 @@ public:
 };
 
 
-std::unique_ptr<Material::Texture> Material::Texture::load(std::string src) {
-	std::unique_ptr<CImgTexture> tex(new CImgTexture);
-	tex.get()->img = cimg_library::CImg<float>(src.c_str());
-	return std::unique_ptr<Material::Texture>(std::move(tex));
+std::shared_ptr<Material::Texture> Material::Texture::fromImage(const std::string &src) {
+	return std::shared_ptr<Material::Texture>(new CImgTexture(src));
 }
