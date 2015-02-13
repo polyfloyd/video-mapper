@@ -64,19 +64,23 @@ CXXWARNINGS := \
 	-Wuninitialized \
 	-Wno-unused-parameter
 
-LDLIBS := \
-	GL \
-	GLEW \
-	X11 \
-	glfw \
-	pthread
+LIBS := \
+	gl \
+	glew \
+	glfw3
 
 CXXINCLUDES := \
 	$(SRCDIR)
 
 COMMONFLAGS := -Wfatal-errors
-CXXFLAGS    := -std=c++0x
-LDFLAGS     := $(addprefix -l, $(LDLIBS))
+CXXFLAGS    := \
+	$(shell pkg-config --cflags $(LIBS)) \
+	-std=c++0x
+LDFLAGS     := \
+	$(shell pkg-config --libs $(LIBS)) \
+	-lpthread \
+	-lX11 # Can't find the pkg-config for these ones
+
 
 ifdef RELEASE
 	COMMONFLAGS := -g0 -O2 $(COMMONFLAGS)
