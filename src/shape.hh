@@ -15,6 +15,8 @@ public:
 
 	public:
 		Vertex(glm::vec3 *vec);
+
+		Vertex(glm::vec3 *vec, float u, float v);
 	};
 
 	class Face {
@@ -24,6 +26,8 @@ public:
 
 	public:
 		Face(glm::vec3 *a, glm::vec3 *b, glm::vec3 *c);
+
+		Face(Vertex a, Vertex b, Vertex c);
 	};
 
 public:

@@ -4,6 +4,17 @@ Shape::Vertex::Vertex(glm::vec3 *vec) {
 	this->vec = vec;
 }
 
+Shape::Vertex::Vertex(glm::vec3 *vec, float u, float v) {
+	this->vec = vec;
+	this->tex = glm::vec2(u, v);
+}
+
+Shape::Face::Face(Vertex a, Vertex b, Vertex c) {
+	this->v[0] = a;
+	this->v[1] = b;
+	this->v[2] = c;
+}
+
 Shape::Face::Face(glm::vec3 *a, glm::vec3 *b, glm::vec3 *c) {
 	this->v[0] = Vertex(a);
 	this->v[1] = Vertex(b);
@@ -20,68 +31,68 @@ Cube::Cube(float size) {
 	}
 
 	this->surfaces.push_back(Face(
-		&this->vertices[0b000],
-		&this->vertices[0b010],
-		&this->vertices[0b100]
+		Vertex(&this->vertices[0b000], 1, 0),
+		Vertex(&this->vertices[0b010], 0, 0),
+		Vertex(&this->vertices[0b100], 1, 1)
 	));
 	this->surfaces.push_back(Face(
-		&this->vertices[0b010],
-		&this->vertices[0b100],
-		&this->vertices[0b110]
-	));
-
-	this->surfaces.push_back(Face(
-		&this->vertices[0b000],
-		&this->vertices[0b010],
-		&this->vertices[0b001]
-	));
-	this->surfaces.push_back(Face(
-		&this->vertices[0b010],
-		&this->vertices[0b001],
-		&this->vertices[0b011]
+		Vertex(&this->vertices[0b010], 0, 0),
+		Vertex(&this->vertices[0b100], 1, 1),
+		Vertex(&this->vertices[0b110], 0, 1)
 	));
 
 	this->surfaces.push_back(Face(
-		&this->vertices[0b000],
-		&this->vertices[0b100],
-		&this->vertices[0b001]
+		Vertex(&this->vertices[0b000], 0, 0),
+		Vertex(&this->vertices[0b010], 0, 0),
+		Vertex(&this->vertices[0b001], 0, 0)
 	));
 	this->surfaces.push_back(Face(
-		&this->vertices[0b100],
-		&this->vertices[0b001],
-		&this->vertices[0b101]
-	));
-
-	this->surfaces.push_back(Face(
-		&this->vertices[0b001],
-		&this->vertices[0b011],
-		&this->vertices[0b101]
-	));
-	this->surfaces.push_back(Face(
-		&this->vertices[0b011],
-		&this->vertices[0b101],
-		&this->vertices[0b111]
+		Vertex(&this->vertices[0b010], 0, 0),
+		Vertex(&this->vertices[0b001], 0, 0),
+		Vertex(&this->vertices[0b011], 0, 0)
 	));
 
 	this->surfaces.push_back(Face(
-		&this->vertices[0b100],
-		&this->vertices[0b110],
-		&this->vertices[0b101]
+		Vertex(&this->vertices[0b000], 0, 0),
+		Vertex(&this->vertices[0b100], 0, 0),
+		Vertex(&this->vertices[0b001], 0, 0)
 	));
 	this->surfaces.push_back(Face(
-		&this->vertices[0b110],
-		&this->vertices[0b101],
-		&this->vertices[0b111]
+		Vertex(&this->vertices[0b100], 0, 0),
+		Vertex(&this->vertices[0b001], 0, 0),
+		Vertex(&this->vertices[0b101], 0, 0)
 	));
 
 	this->surfaces.push_back(Face(
-		&this->vertices[0b010],
-		&this->vertices[0b110],
-		&this->vertices[0b011]
+		Vertex(&this->vertices[0b001], 0, 0),
+		Vertex(&this->vertices[0b011], 0, 0),
+		Vertex(&this->vertices[0b101], 0, 0)
 	));
 	this->surfaces.push_back(Face(
-		&this->vertices[0b110],
-		&this->vertices[0b011],
-		&this->vertices[0b111]
+		Vertex(&this->vertices[0b011], 0, 0),
+		Vertex(&this->vertices[0b101], 0, 0),
+		Vertex(&this->vertices[0b111], 0, 0)
+	));
+
+	this->surfaces.push_back(Face(
+		Vertex(&this->vertices[0b100], 1, 0),
+		Vertex(&this->vertices[0b110], 0, 0),
+		Vertex(&this->vertices[0b101], 1, 1)
+	));
+	this->surfaces.push_back(Face(
+		Vertex(&this->vertices[0b110], 0, 0),
+		Vertex(&this->vertices[0b101], 1, 1),
+		Vertex(&this->vertices[0b111], 0, 1)
+	));
+
+	this->surfaces.push_back(Face(
+		Vertex(&this->vertices[0b010], 1, 0),
+		Vertex(&this->vertices[0b110], 1, 1),
+		Vertex(&this->vertices[0b011], 0, 0)
+	));
+	this->surfaces.push_back(Face(
+		Vertex(&this->vertices[0b110], 1, 1),
+		Vertex(&this->vertices[0b011], 0, 0),
+		Vertex(&this->vertices[0b111], 0, 1)
 	));
 }
