@@ -51,6 +51,13 @@ OpenGLRenderer::OpenGLRenderer(std::function<GLFWmonitor*(std::vector<GLFWmonito
 		fatalf("Could not initialize GLEW");
 	}
 
+	debugf("GLFW Version:        %s", glfwGetVersionString());
+	debugf("GLEW Version:        %s", glewGetString(GLEW_VERSION));
+	debugf("OpenGL Version:      %s", glGetString(GL_VERSION));
+	debugf("OpenGL Vendor:       %s", glGetString(GL_VENDOR));
+	debugf("OpenGL Renderer:     %s", glGetString(GL_RENDERER));
+	debugf("OpenGL GLSL Version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
 	if (GLEW_ARB_debug_output) {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
