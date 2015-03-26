@@ -26,7 +26,7 @@ endif
 # }}}
 # Package metadata {{{
 
-PACKAGE_NAME    := generals
+PACKAGE_NAME    := projection
 PACKAGE_VERSION := $(shell git describe --always --dirty)
 
 ifndef PACKAGE_VERSION
