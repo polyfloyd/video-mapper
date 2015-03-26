@@ -15,6 +15,11 @@ void glVertexVec3(const glm::vec3 &vec) {
 	glVertex3f(vec.x, vec.y, vec.z);
 };
 
+void glColorVec3(const glm::vec3 &vec) {
+	glColor3f(vec.x, vec.y, vec.z);
+};
+
+
 OpenGLRenderer::OpenGLRenderer(std::function<GLFWmonitor*(std::vector<GLFWmonitor*>)> monSelector) {
 	glfwSetErrorCallback([](int code, const char *message) {
 		fatalf("GLFW: %s (%i)", message, code);
@@ -84,6 +89,7 @@ OpenGLRenderer::OpenGLRenderer(std::function<GLFWmonitor*(std::vector<GLFWmonito
 	}
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
 
 	glMatrixMode(GL_PROJECTION);
 	float ratio = this->getAspectRatio();
@@ -106,9 +112,19 @@ void OpenGLRenderer::render(const std::list<Shape*> shapes) {
 
 	glBegin(GL_TRIANGLES);
 	for (auto &shape : shapes) {
+
 		for (auto &face : shape->getFaces()) {
 			if (face.mat) {
-				glColor3f(face.mat->color[0], face.mat->color[1], face.mat->color[2]);
+				if (face.mat->tex) {
+					glEnd();
+					GLuint tex = this->getCachedTexture(face.mat->tex);
+					glBindTexture(GL_TEXTURE_2D, tex);
+					glActiveTexture(GL_TEXTURE0);
+
+					glBegin(GL_TRIANGLES);
+				} else {
+					glColorVec3(face.mat->color);
+				}
 			}
 			for (int i = 0; i < 3; i++) {
 				glNormalVec3(face.v[i].normal);
@@ -116,11 +132,43 @@ void OpenGLRenderer::render(const std::list<Shape*> shapes) {
 				glVertexVec3(*face.v[i].vec);
 			}
 		}
+
 	}
 	glEnd();
 
 	glfwSwapBuffers(this->window);
 	glfwPollEvents();
+}
+
+GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material::Texture> tex) {
+	GLuint glTex = this->textures[tex.get()];
+	if (!glTex) {
+		debugf("Creating texture with size %ix%i and spectrum %s",
+			tex->getWidth(),
+			tex->getHeight(),
+			tex->hasAlpha() ? "RGBA" : "RGB"
+		);
+		glGenTextures(1, &glTex);
+		this->textures[tex.get()] = glTex;
+		glBindTexture(GL_TEXTURE_2D, glTex);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexImage2D(
+			GL_TEXTURE_2D,                      // target
+			0,                                  // level
+			tex->hasAlpha() ? GL_RGBA : GL_RGB, // internalformat
+			tex->getWidth(),                    // width
+			tex->getHeight(),                   // height
+			0,                                  // border
+			tex->hasAlpha() ? GL_RGBA : GL_RGB, // format
+			GL_UNSIGNED_BYTE,                   // type
+			tex->getImage()                     // data
+		);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	return glTex;
 }
 
 bool OpenGLRenderer::isAlive() const {

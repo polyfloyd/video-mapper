@@ -20,6 +20,7 @@ class OpenGLRenderer : public Renderer {
 protected:
 	GLFWwindow  *window;
 	GLFWmonitor *monitor;
+	std::map<Material::Texture*, GLuint> textures;
 
 public:
 	OpenGLRenderer(std::function<GLFWmonitor*(std::vector<GLFWmonitor*>)>);
@@ -27,6 +28,8 @@ public:
 	~OpenGLRenderer();
 
 	void render(std::list<Shape*> shapes);
+
+	GLuint getCachedTexture(std::shared_ptr<Material::Texture> tex);
 
 	bool isAlive() const;
 

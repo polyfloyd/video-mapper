@@ -36,6 +36,7 @@ int main(int argc, char **argv) {
 
 	Cube cube1(1.0f);
 	Cube cube2(1.0f);
+	auto texture = Material::Texture::fromImage("res/test.png");
 	Material colors[6];
 	for (int i = 0; i < 6; i++) {
 		colors[i].color = glm::vec3(
@@ -43,6 +44,7 @@ int main(int argc, char **argv) {
 			(i + 1) & 0x2 ? 1.0f : 0.0f,
 			(i + 1) & 0x4 ? 1.0f : 0.0f
 		);
+		colors[i].tex = texture;
 		cube1.getFaces()[i * 2].mat = cube1.getFaces()[i * 2 + 1].mat = &colors[i];
 		cube2.getFaces()[i * 2].mat = cube2.getFaces()[i * 2 + 1].mat = &colors[i];
 	}
