@@ -16,7 +16,9 @@ public:
 
 		virtual int getHeight() const = 0;
 
-		virtual const float *getImage() const = 0;
+		virtual bool hasAlpha() const = 0;
+
+		virtual const uint8_t *getImage() const = 0;
 	};
 
 public:
