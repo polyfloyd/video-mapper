@@ -110,6 +110,8 @@ void OpenGLRenderer::render(const Scene *scene) {
 	glViewport(0, 0, fbWidth, fbHeight);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
+	std::map<std::shared_ptr<Material::Texture>, bool> updatedTextures;
+
 	glBegin(GL_TRIANGLES);
 	for (auto &shape : scene->getShapes()) {
 
@@ -117,6 +119,12 @@ void OpenGLRenderer::render(const Scene *scene) {
 			if (face.mat) {
 				if (face.mat->tex) {
 					glEnd();
+
+					if (!updatedTextures[face.mat->tex]) {
+						updatedTextures[face.mat->tex] = true;
+						face.mat->tex->update();
+					}
+
 					GLuint tex = this->getCachedTexture(face.mat->tex);
 					glBindTexture(GL_TEXTURE_2D, tex);
 					glActiveTexture(GL_TEXTURE0);
@@ -142,6 +150,8 @@ void OpenGLRenderer::render(const Scene *scene) {
 
 GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material::Texture> tex) {
 	GLuint glTex = this->textures[tex.get()];
+	bool   init  = !!glTex;
+
 	if (!glTex) {
 		debugf("Creating texture with size %ix%i and spectrum %s",
 			tex->getWidth(),
@@ -155,6 +165,10 @@ GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material::Texture> tex) 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
+
+	if (init || tex->isDirty()) {
+		glBindTexture(GL_TEXTURE_2D, glTex);
 		glTexImage2D(
 			GL_TEXTURE_2D,                      // target
 			0,                                  // level
@@ -168,6 +182,7 @@ GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material::Texture> tex) 
 		);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
+
 	return glTex;
 }
 

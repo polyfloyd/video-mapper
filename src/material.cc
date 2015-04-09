@@ -38,6 +38,12 @@ public:
 		return this->alpha;
 	};
 
+	bool isDirty() const {
+		return false;
+	}
+
+	void update() { }
+
 	const uint8_t *getImage() const {
 		return this->data.get();
 	};

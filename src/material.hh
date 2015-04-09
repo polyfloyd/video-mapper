@@ -18,6 +18,10 @@ public:
 
 		virtual bool hasAlpha() const = 0;
 
+		virtual bool isDirty() const = 0;
+
+		virtual void update() = 0;
+
 		virtual const uint8_t *getImage() const = 0;
 	};
 
