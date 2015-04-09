@@ -67,7 +67,13 @@ CXXWARNINGS := \
 LIBS := \
 	gl \
 	glew \
-	glfw3
+	glfw3 \
+	libavcodec \
+	libavformat \
+	libavutil \
+	libswscale \
+	x11 \
+	zlib
 
 CXXINCLUDES := \
 	$(SRCDIR)
@@ -79,7 +85,7 @@ CXXFLAGS    := \
 LDFLAGS     := \
 	$(shell pkg-config --libs $(LIBS)) \
 	-lpthread \
-	-lX11 # Can't find the pkg-config for these ones
+	-lm # Can't find the pkg-config for these ones
 
 
 ifdef RELEASE
