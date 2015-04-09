@@ -9,6 +9,7 @@ public:
 	class Texture {
 	public:
 		static std::shared_ptr<Material::Texture> fromImage(const std::string &src);
+		static std::shared_ptr<Material::Texture> fromVideo(const std::string &src);
 
 		virtual ~Texture() = default;
 
