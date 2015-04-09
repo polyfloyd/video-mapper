@@ -104,14 +104,14 @@ OpenGLRenderer::~OpenGLRenderer() {
 	glfwTerminate();
 }
 
-void OpenGLRenderer::render(const std::list<Shape*> shapes) {
+void OpenGLRenderer::render(const Scene *scene) {
 	int fbWidth, fbHeight;
 	glfwGetFramebufferSize(this->window, &fbWidth, &fbHeight);
 	glViewport(0, 0, fbWidth, fbHeight);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	glBegin(GL_TRIANGLES);
-	for (auto &shape : shapes) {
+	for (auto &shape : scene->getShapes()) {
 
 		for (auto &face : shape->getFaces()) {
 			if (face.mat) {

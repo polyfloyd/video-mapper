@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "common.hh"
+#include "scene.hh"
 #include "shape.hh"
 #include "renderer.hh"
 
@@ -25,7 +26,7 @@ GLFWmonitor *selectMonitor(std::vector<GLFWmonitor*> monitors) {
 	return mon;
 }
 
-int main(int argc, char **argv) {
+void populateScene(Scene *scene) {
 	glm::mat4 model =
 		glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -10)) *
 		glm::rotate(glm::mat4(1.0f), 32.0f, glm::vec3(1, 0, 0)) *
@@ -34,36 +35,40 @@ int main(int argc, char **argv) {
 	glm::mat4 projection = glm::mat4(1.0f);
 	glm::mat4 mvp = projection * view * model;
 
-	Cube cube1(1.0f);
-	Cube cube2(1.0f);
+	auto cube1 = std::unique_ptr<Shape>(new Cube(1.0f));
+	auto cube2 = std::unique_ptr<Shape>(new Cube(1.0f));
+
 	auto texture = Material::Texture::fromImage("res/test.png");
-	Material colors[6];
 	for (int i = 0; i < 6; i++) {
-		colors[i].color = glm::vec3(
+		std::shared_ptr<Material> mat(new Material);
+		mat->color = glm::vec3(
 			(i + 1) & 0x1 ? 1.0f : 0.0f,
 			(i + 1) & 0x2 ? 1.0f : 0.0f,
 			(i + 1) & 0x4 ? 1.0f : 0.0f
 		);
-		colors[i].tex = texture;
-		cube1.getFaces()[i * 2].mat = cube1.getFaces()[i * 2 + 1].mat = &colors[i];
-		cube2.getFaces()[i * 2].mat = cube2.getFaces()[i * 2 + 1].mat = &colors[i];
+		mat->tex = texture;
+		cube1->getFaces()[i * 2].mat = cube1->getFaces()[i * 2 + 1].mat = mat;
+		cube2->getFaces()[i * 2].mat = cube2->getFaces()[i * 2 + 1].mat = mat;
 	}
 
-	std::list<Shape*> shapes;
-	shapes.push_back(&cube1);
-//	shapes.push_back(&cube2);
+	scene->addShape(cube1);
+//	scene->addShape(cube2);
 
-	for (auto &shape : shapes) {
+	for (auto &shape : scene->getShapes()) {
 		for (auto &vert : *shape->getVertices()) {
 			vert = (mvp * glm::vec4(vert, 1)).xyz();
 		}
 	}
+}
 
+int main(int argc, char **argv) {
 	glm::vec3 *draggedVertex = nullptr;
 	bool wireframe         = false;
 	bool wireframeDebounce = false;
 
 	OpenGLRenderer renderer(selectMonitor);
+	Scene scene;
+	populateScene(&scene);
 
 	while (renderer.isAlive()) {
 		if (glfwGetKey(renderer.getWindow(), GLFW_KEY_W) == GLFW_PRESS) {
@@ -87,7 +92,7 @@ int main(int argc, char **argv) {
 				-(cursorPosY / windowHeight * 2 - 1)
 			);
 			if (!draggedVertex) {
-				for (auto &shape : shapes) {
+				for (auto &shape : scene.getShapes()) {
 					for (auto &vert : *shape->getVertices()) {
 						if (glm::distance(cursor, vert.xy()) < 0.1f) {
 							draggedVertex = &vert;
@@ -103,7 +108,7 @@ int main(int argc, char **argv) {
 			draggedVertex = nullptr;
 		}
 
-		renderer.render(shapes);
+		renderer.render(&scene);
 	}
 	debugf("Bye!");
 }

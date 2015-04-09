@@ -21,8 +21,8 @@ public:
 
 	class Face {
 	public:
-		Material *mat = nullptr;
-		Vertex   v[3] = { nullptr, nullptr, nullptr };
+		std::shared_ptr<Material> mat;
+		Vertex                    v[3] = { nullptr, nullptr, nullptr };
 
 	public:
 		Face(glm::vec3 *a, glm::vec3 *b, glm::vec3 *c);
