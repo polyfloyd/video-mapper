@@ -14,7 +14,6 @@ protected:
 	struct SwsContext *swsContext;
 	AVCodecContext    *codecContext  = NULL;
 	AVFormatContext   *formatContext = NULL;
-	AVFrame           *frame         = NULL;
 	AVFrame           *frameRGB      = NULL;
 
 public:
@@ -57,11 +56,7 @@ public:
 		}
 		av_dict_free(&codecOptions);
 
-		// Allocate AVFrame structures
-		this->frame = avcodec_alloc_frame();
-		if (!this->frame) {
-			throw std::runtime_error("Could not allocate frame");
-		}
+		// Allocate AVFrame structure
 		this->frameRGB = avcodec_alloc_frame();
 		if (!this->frameRGB) {
 			throw std::runtime_error("Could not allocate target frame");
@@ -92,7 +87,6 @@ public:
 
 	~VideoTexture() {
 		av_free(this->buffer);
-		avcodec_free_frame(&this->frame);
 		avcodec_free_frame(&this->frameRGB);
 	}
 
@@ -114,18 +108,23 @@ public:
 			return;
 		}
 
+		AVFrame *frame = avcodec_alloc_frame();
+		if (!frame) {
+			throw std::runtime_error("Could not allocate frame");
+		}
+
 		AVPacket packet;
 		int readOk;
 		while ((readOk = av_read_frame(this->formatContext, &packet) >= 0)) {
 			if (packet.stream_index == this->streamIndex) {
 				int finished;
-				avcodec_decode_video2(this->codecContext, this->frame, &finished, &packet);
+				avcodec_decode_video2(this->codecContext, frame, &finished, &packet);
 				if (finished) {
 					// Convert the image from its native format to RGB
 					sws_scale(
 						this->swsContext,
-						(uint8_t const* const*)this->frame->data,
-						this->frame->linesize,
+						(uint8_t const* const*)frame->data,
+						frame->linesize,
 						0,
 						this->codecContext->height,
 						this->frameRGB->data,
@@ -143,6 +142,8 @@ public:
 		if (!readOk) {
 			av_seek_frame(this->formatContext, this->streamIndex, 0, AVSEEK_FLAG_ANY);
 		}
+
+		avcodec_free_frame(&frame);
 	}
 
 	bool isDirty() const {
