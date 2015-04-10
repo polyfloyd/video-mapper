@@ -60,11 +60,11 @@ public:
 		// Allocate AVFrame structures
 		this->frame = avcodec_alloc_frame();
 		if (!this->frame) {
-			throw std::runtime_error("Could allocate frame");
+			throw std::runtime_error("Could not allocate frame");
 		}
 		this->frameRGB = avcodec_alloc_frame();
 		if (!this->frameRGB) {
-			throw std::runtime_error("Could allocate target frame");
+			throw std::runtime_error("Could not allocate target frame");
 		}
 
 		// Determine required nuffer size and allocate buffer
