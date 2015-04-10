@@ -131,6 +131,7 @@ public:
 						this->frameRGB->linesize
 					);
 
+					av_free_packet(&packet);
 					break;
 				}
 			}
