@@ -180,7 +180,6 @@ GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material::Texture> tex) 
 			GL_UNSIGNED_BYTE,                   // type
 			tex->getImage()                     // data
 		);
-		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 
 	return glTex;
