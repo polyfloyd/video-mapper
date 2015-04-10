@@ -150,9 +150,9 @@ void OpenGLRenderer::render(const Scene *scene) {
 
 GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material::Texture> tex) {
 	GLuint glTex = this->textures[tex.get()];
-	bool   init  = !!glTex;
+	bool   init  = !glTex;
 
-	if (!glTex) {
+	if (init) {
 		debugf("Creating texture with size %ix%i and spectrum %s",
 			tex->getWidth(),
 			tex->getHeight(),
