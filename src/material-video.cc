@@ -115,7 +115,8 @@ public:
 		}
 
 		AVPacket packet;
-		while (av_read_frame(this->formatContext, &packet) >= 0) {
+		int readOk;
+		while ((readOk = av_read_frame(this->formatContext, &packet) >= 0)) {
 			if (packet.stream_index == this->streamIndex) {
 				int finished;
 				avcodec_decode_video2(this->codecContext, this->frame, &finished, &packet);
@@ -136,6 +137,11 @@ public:
 				}
 			}
 			av_free_packet(&packet);
+		}
+
+		// All frames are consumed, Seek to the beginning
+		if (!readOk) {
+			av_seek_frame(this->formatContext, this->streamIndex, 0, AVSEEK_FLAG_ANY);
 		}
 	}
 
