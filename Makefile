@@ -68,12 +68,8 @@ LIBS := \
 	gl \
 	glew \
 	glfw3 \
-	libavcodec \
-	libavformat \
-	libavutil \
-	libswscale \
-	x11 \
-	zlib
+	libvlc \
+	x11
 
 CXXINCLUDES := \
 	$(SRCDIR)

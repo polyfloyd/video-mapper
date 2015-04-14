@@ -1,158 +1,108 @@
 #include "material.hh"
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libavutil/avutil.h>
-#include <libswscale/swscale.h>
-}
+#include <mutex>
+#include <vlc/vlc.h>
 
 class VideoTexture : public Material::Texture {
 protected:
-	int                streamIndex;
-	bool               dirtyFlag;
-	uint8_t           *buffer;
-	struct SwsContext *swsContext;
-	AVCodecContext    *codecContext  = NULL;
-	AVFormatContext   *formatContext = NULL;
-	AVFrame           *frameRGB      = NULL;
+	std::vector<std::unique_ptr<uint8_t[]>> buffers;
+	std::mutex                              bufferLock;
+	int                                     bufferSelect;
+	bool                                    shouldSwap;
+
+	libvlc_media_t        *media;
+	libvlc_media_player_t *mediaPlayer;
+
+	bool dirty;
+	int  width, height;
 
 public:
 	VideoTexture(const std::string &src) {
-		static bool avInitialized = false;
-		if (!avInitialized) {
-			avInitialized = true;
-			av_register_all();
+		static char const *vlcArgv[] = {
+			"--intf", "dummy",
+			"--no-audio",
+			"--no-disable-screensaver",
+			"--no-inhibit",
+			"--no-snapshot-preview",
+			"--no-stats",
+			"--no-sub-autodetect-file",
+			"--no-sub-autodetect-file",
+			"--no-video-title-show",
+			"--no-xlib",
+		};
+
+		static libvlc_instance_t *vlc = nullptr;
+		if (!vlc) {
+			vlc = libvlc_new(sizeof(vlcArgv) / sizeof(*vlcArgv), vlcArgv);
 		}
 
-		if (avformat_open_input(&this->formatContext, src.c_str(), NULL, NULL) != 0) {
-			throw std::runtime_error("Could not open video file");
-		}
+		this->media       = libvlc_media_new_path(vlc, src.c_str());
+		this->mediaPlayer = libvlc_media_player_new_from_media(this->media);
+		libvlc_media_parse(this->media);
+		libvlc_media_add_option(this->media, "input-repeat=-1");
 
-		if (avformat_find_stream_info(this->formatContext, NULL) < 0) {
-			throw std::runtime_error("Couldn't find stream information");
+		unsigned w, h;
+		if (libvlc_video_get_size(this->mediaPlayer, 0, &w, &h) != 0) {
+			fatalf("Video 0 does not exist");
 		}
+		this->width  = w;
+		this->height = h;
 
-		// Find the first video stream and grab the codec
-		for (unsigned int i = 0; i < this->formatContext->nb_streams; i++) {
-			if (this->formatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
-				this->streamIndex = i;
-				break;
-			}
+		this->bufferSelect = 0;
+		for (int i = 0; i < 2; i++) {
+			this->buffers.push_back(std::unique_ptr<uint8_t[]>(new uint8_t[this->width * this->height * 4]));
 		}
-		this->codecContext = this->formatContext->streams[this->streamIndex]->codec;
-		if (!this->codecContext) {
-			throw std::runtime_error("Didn't find a video stream");
-		}
+		libvlc_video_set_format(this->mediaPlayer, "RGBA", this->width, this->height, this->width * 4);
 
-		// Find the decoder for the video stream
-		AVCodec *codec = avcodec_find_decoder(this->codecContext->codec_id);
-		if (!codec) {
-			throw std::runtime_error("Codec not found");
-		}
-		// Open codec
-		AVDictionary *codecOptions = NULL;
-		if (avcodec_open2(this->codecContext, codec, &codecOptions) < 0) {
-			throw std::runtime_error("Could not open codec");
-		}
-		av_dict_free(&codecOptions);
+		auto lockCallback = [](void *data, void **pixels) {
+			VideoTexture *self = static_cast<VideoTexture*>(data);
+			int nextBuffer = (self->bufferSelect + 1) % self->buffers.size();
+			*pixels = self->buffers[nextBuffer].get();
+			return (void*)nullptr;
+		};
+		auto unlockCallback = [](void *data, void *id, void *const *pixels) { };
+		auto displayCallback = [](void *data, void *id) {
+			VideoTexture *self = static_cast<VideoTexture*>(data);
+			self->shouldSwap = true;
+		};
+		libvlc_video_set_callbacks(this->mediaPlayer, lockCallback, unlockCallback, displayCallback, this);
 
-		// Allocate AVFrame structure
-		this->frameRGB = avcodec_alloc_frame();
-		if (!this->frameRGB) {
-			throw std::runtime_error("Could not allocate target frame");
-		}
-
-		// Determine required nuffer size and allocate buffer
-		int bufferSize = avpicture_get_size(PIX_FMT_RGB24, this->codecContext->width, this->codecContext->height);
-		this->buffer = (uint8_t*)av_malloc(bufferSize * sizeof(uint8_t));
-
-		this->swsContext = sws_getContext(
-			this->codecContext->width,
-			this->codecContext->height,
-			this->codecContext->pix_fmt,
-			this->codecContext->width,
-			this->codecContext->height,
-			PIX_FMT_RGB24,
-			SWS_BILINEAR,
-			NULL,
-			NULL,
-			NULL
-		);
-
-		// Assign appropriate parts of buffer to image planes in frameRGB
-		// Note that prameRGB is an AVFrame, but AVFrame is a superset
-		// of AVPicture
-		avpicture_fill((AVPicture*)this->frameRGB, this->buffer, PIX_FMT_RGB24, this->codecContext->width, this->codecContext->height);
+		libvlc_media_player_play(this->mediaPlayer);
 	};
 
 	~VideoTexture() {
-		av_free(this->buffer);
-		avcodec_free_frame(&this->frameRGB);
+		libvlc_media_release(this->media);
+		libvlc_media_player_release(this->mediaPlayer);
 	}
 
 	int getWidth() const {
-		return this->codecContext->width;
+		return this->width;
 	};
 
 	int getHeight() const {
-		return this->codecContext->height;
+		return this->height;
 	};
 
 	bool hasAlpha() const {
-		return false;
+		return true;
 	};
 
-	void update() {
-		this->dirtyFlag = true; // TODO: follow the framerate fo the videostream
-		if (!this->dirtyFlag) {
-			return;
-		}
-
-		AVFrame *frame = avcodec_alloc_frame();
-		if (!frame) {
-			throw std::runtime_error("Could not allocate frame");
-		}
-
-		AVPacket packet;
-		int readOk;
-		while ((readOk = av_read_frame(this->formatContext, &packet) >= 0)) {
-			if (packet.stream_index == this->streamIndex) {
-				int finished;
-				avcodec_decode_video2(this->codecContext, frame, &finished, &packet);
-				if (finished) {
-					// Convert the image from its native format to RGB
-					sws_scale(
-						this->swsContext,
-						(uint8_t const* const*)frame->data,
-						frame->linesize,
-						0,
-						this->codecContext->height,
-						this->frameRGB->data,
-						this->frameRGB->linesize
-					);
-
-					av_free_packet(&packet);
-					break;
-				}
-			}
-			av_free_packet(&packet);
-		}
-
-		// All frames are consumed, Seek to the beginning
-		if (!readOk) {
-			av_seek_frame(this->formatContext, this->streamIndex, 0, AVSEEK_FLAG_ANY);
-		}
-
-		avcodec_free_frame(&frame);
-	}
-
 	bool isDirty() const {
-		return this->dirtyFlag;
+		return this->dirty;
 	}
 
 	const uint8_t *getImage() const {
-		return this->frameRGB->data[0];
+		return this->buffers[this->bufferSelect].get();
 	};
+
+	void update() {
+		this->dirty = false;
+		if (this->shouldSwap) {
+			std::lock_guard<std::mutex> _(this->bufferLock);
+			this->shouldSwap = false;
+			this->dirty      = true;
+			this->bufferSelect = (this->bufferSelect + 1) % this->buffers.size();
+		}
+	}
 };
 
 
