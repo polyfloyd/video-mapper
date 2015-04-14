@@ -167,7 +167,7 @@ GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material::Texture> tex) 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 
-	if (init || tex->isDirty()) {
+	if (init) {
 		glBindTexture(GL_TEXTURE_2D, glTex);
 		glTexImage2D(
 			GL_TEXTURE_2D,                      // target
@@ -176,6 +176,19 @@ GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material::Texture> tex) 
 			tex->getWidth(),                    // width
 			tex->getHeight(),                   // height
 			0,                                  // border
+			tex->hasAlpha() ? GL_RGBA : GL_RGB, // format
+			GL_UNSIGNED_BYTE,                   // type
+			tex->getImage()                     // data
+		);
+	} else if (tex->isDirty()) {
+		glBindTexture(GL_TEXTURE_2D, glTex);
+		glTexSubImage2D(
+			GL_TEXTURE_2D,                      // target
+			0,                                  // level
+			0,                                  // xoffset
+			0,                                  // yoffset
+			tex->getWidth(),                    // width
+			tex->getHeight(),                   // height
 			tex->hasAlpha() ? GL_RGBA : GL_RGB, // format
 			GL_UNSIGNED_BYTE,                   // type
 			tex->getImage()                     // data
