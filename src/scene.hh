@@ -15,15 +15,13 @@ protected:
 public:
 	virtual void update() = 0;
 
-	void addShape(Shape *shape) {
-		this->shapes.push_back(std::unique_ptr<Shape>(shape));
-	}
-
-	void addShape(std::unique_ptr<Shape> &shape) {
+	virtual void addShape(std::unique_ptr<Shape> &shape) {
 		this->shapes.push_back(std::move(shape));
 	}
 
-	void removeShape(Shape *shape);
+	virtual void removeShape(Shape *shape);
+
+	void addShape(Shape *shape);
 
 	const std::list<Shape*> getShapes() const;
 };

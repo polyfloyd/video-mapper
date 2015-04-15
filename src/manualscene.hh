@@ -17,6 +17,8 @@ public:
 	ManualScene(OpenGLRenderer *renderer)
 		: renderer(renderer), draggedVertex(nullptr) {};
 
+	void addShape(std::unique_ptr<Shape> &shape);
+
 	void update();
 };
 

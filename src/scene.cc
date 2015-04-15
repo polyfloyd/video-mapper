@@ -1,5 +1,10 @@
 #include "scene.hh"
 
+void Scene::addShape(Shape *shape) {
+	std::unique_ptr<Shape> p(shape);
+	this->addShape(p);
+}
+
 void Scene::removeShape(Shape *shape) {
 	this->shapes.remove_if([shape](const std::unique_ptr<Shape> &s) {
 		return shape == s.get();

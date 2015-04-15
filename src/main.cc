@@ -1,9 +1,5 @@
-#define GLM_SWIZZLE
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include "common.hh"
 #include "manualscene.hh"
 #include "renderer.hh"
@@ -28,14 +24,6 @@ GLFWmonitor *selectMonitor(std::vector<GLFWmonitor*> monitors) {
 }
 
 void populateScene(Scene *scene) {
-	glm::mat4 model =
-		glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -10)) *
-		glm::rotate(glm::mat4(1.0f), 32.0f, glm::vec3(1, 0, 0)) *
-		glm::rotate(glm::mat4(1.0f), 45.0f, glm::vec3(0, 1, 0));
-	glm::mat4 view = glm::mat4(1.0f);
-	glm::mat4 projection = glm::mat4(1.0f);
-	glm::mat4 mvp = projection * view * model;
-
 	auto cube1 = std::unique_ptr<Shape>(new Cube(1.0f));
 	auto cube2 = std::unique_ptr<Shape>(new Cube(1.0f));
 
@@ -54,12 +42,6 @@ void populateScene(Scene *scene) {
 
 	scene->addShape(cube1);
 //	scene->addShape(cube2);
-
-	for (auto &shape : scene->getShapes()) {
-		for (auto &vert : *shape->getVertices()) {
-			vert = (mvp * glm::vec4(vert, 1)).xyz();
-		}
-	}
 }
 
 int main(int argc, char **argv) {
