@@ -5,9 +5,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "common.hh"
+#include "manualscene.hh"
+#include "renderer.hh"
 #include "scene.hh"
 #include "shape.hh"
-#include "renderer.hh"
 
 GLFWmonitor *selectMonitor(std::vector<GLFWmonitor*> monitors) {
 	GLFWmonitor *mon = nullptr;
@@ -62,12 +63,11 @@ void populateScene(Scene *scene) {
 }
 
 int main(int argc, char **argv) {
-	glm::vec3 *draggedVertex = nullptr;
 	bool wireframe         = false;
 	bool wireframeDebounce = false;
 
 	OpenGLRenderer renderer(selectMonitor);
-	Scene scene;
+	ManualScene scene(&renderer);
 	populateScene(&scene);
 
 	while (renderer.isAlive()) {
@@ -82,32 +82,7 @@ int main(int argc, char **argv) {
 			wireframeDebounce = false;
 		}
 
-		if (glfwGetMouseButton(renderer.getWindow(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
-			int windowWidth, windowHeight;
-			double cursorPosX, cursorPosY;
-			glfwGetWindowSize(renderer.getWindow(), &windowWidth, &windowHeight);
-			glfwGetCursorPos(renderer.getWindow(), &cursorPosX, &cursorPosY);
-			glm::vec2 cursor(
-				(cursorPosX / windowWidth  * 2 - 1) * renderer.getAspectRatio(),
-				-(cursorPosY / windowHeight * 2 - 1)
-			);
-			if (!draggedVertex) {
-				for (auto &shape : scene.getShapes()) {
-					for (auto &vert : *shape->getVertices()) {
-						if (glm::distance(cursor, vert.xy()) < 0.1f) {
-							draggedVertex = &vert;
-							break;
-						}
-					}
-				}
-			} else {
-				draggedVertex->x = cursor.x;
-				draggedVertex->y = cursor.y;
-			}
-		} else {
-			draggedVertex = nullptr;
-		}
-
+		scene.update();
 		renderer.render(&scene);
 	}
 	debugf("Bye!");

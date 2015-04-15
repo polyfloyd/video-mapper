@@ -4,12 +4,16 @@
 #include "common.hh"
 #include "shape.hh"
 
+/**
+ * An implementation of the Scene transforms its shapes to match real-world
+ * objects.
+ */
 class Scene {
 protected:
 	std::list<std::unique_ptr<Shape>> shapes;
 
 public:
-	Scene() = default;
+	virtual void update() = 0;
 
 	void addShape(Shape *shape) {
 		this->shapes.push_back(std::unique_ptr<Shape>(shape));
