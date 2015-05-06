@@ -8,9 +8,6 @@ class Material {
 public:
 	glm::mat3 rotation;
 
-	static std::shared_ptr<Material> fromImage(const std::string &src);
-	static std::shared_ptr<Material> fromVideo(const std::string &src);
-
 	virtual ~Material() = default;
 
 	virtual int getWidth() const = 0;

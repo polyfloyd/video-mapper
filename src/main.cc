@@ -2,6 +2,9 @@
 #include <GLFW/glfw3.h>
 #include "common.hh"
 #include "manualscene.hh"
+#include "material/material.hh"
+#include "material/imagematerial.hh"
+#include "material/videomaterial.hh"
 #include "renderer.hh"
 #include "scene.hh"
 #include "shape.hh"
@@ -27,7 +30,7 @@ void populateScene(Scene *scene) {
 	auto cube1 = std::unique_ptr<Shape>(new Cube(1.0f));
 	auto cube2 = std::unique_ptr<Shape>(new Cube(1.0f));
 
-	auto mat = Material::fromImage("res/test.png");
+	auto mat = std::shared_ptr<Material>(new ImageMaterial("res/test.png"));
 	for (int i = 0; i < 6; i++) {
 		cube1->getFaces()[i * 2].mat = cube1->getFaces()[i * 2 + 1].mat = mat;
 		cube2->getFaces()[i * 2].mat = cube2->getFaces()[i * 2 + 1].mat = mat;

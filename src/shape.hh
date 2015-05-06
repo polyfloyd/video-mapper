@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 #include "common.hh"
-#include "material.hh"
+#include "material/material.hh"
 
 class Shape {
 public:
