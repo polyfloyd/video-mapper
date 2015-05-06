@@ -110,29 +110,25 @@ void OpenGLRenderer::render(const Scene *scene) {
 	glViewport(0, 0, fbWidth, fbHeight);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	std::map<std::shared_ptr<Material::Texture>, bool> updatedTextures;
+	std::map<std::shared_ptr<Material>, bool> updatedTextures;
 
 	glBegin(GL_TRIANGLES);
 	for (auto &shape : scene->getShapes()) {
 
 		for (auto &face : shape->getFaces()) {
 			if (face.mat) {
-				if (face.mat->tex) {
-					glEnd();
+				glEnd();
 
-					if (!updatedTextures[face.mat->tex]) {
-						updatedTextures[face.mat->tex] = true;
-						face.mat->tex->update();
-					}
-
-					GLuint tex = this->getCachedTexture(face.mat->tex);
-					glBindTexture(GL_TEXTURE_2D, tex);
-					glActiveTexture(GL_TEXTURE0);
-
-					glBegin(GL_TRIANGLES);
-				} else {
-					glColorVec3(face.mat->color);
+				if (!updatedTextures[face.mat]) {
+					updatedTextures[face.mat] = true;
+					face.mat->update();
 				}
+
+				GLuint tex = this->getCachedTexture(face.mat);
+				glBindTexture(GL_TEXTURE_2D, tex);
+				glActiveTexture(GL_TEXTURE0);
+
+				glBegin(GL_TRIANGLES);
 			}
 			for (int i = 0; i < 3; i++) {
 				glNormalVec3(face.v[i].normal);
@@ -148,7 +144,7 @@ void OpenGLRenderer::render(const Scene *scene) {
 	glfwPollEvents();
 }
 
-GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material::Texture> tex) {
+GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material> tex) {
 	GLuint glTex = this->textures[tex.get()];
 	bool   init  = !glTex;
 

@@ -27,15 +27,8 @@ void populateScene(Scene *scene) {
 	auto cube1 = std::unique_ptr<Shape>(new Cube(1.0f));
 	auto cube2 = std::unique_ptr<Shape>(new Cube(1.0f));
 
-	auto texture = Material::Texture::fromImage("res/test.png");
+	auto mat = Material::fromImage("res/test.png");
 	for (int i = 0; i < 6; i++) {
-		std::shared_ptr<Material> mat(new Material);
-		mat->color = glm::vec3(
-			(i + 1) & 0x1 ? 1.0f : 0.0f,
-			(i + 1) & 0x2 ? 1.0f : 0.0f,
-			(i + 1) & 0x4 ? 1.0f : 0.0f
-		);
-		mat->tex = texture;
 		cube1->getFaces()[i * 2].mat = cube1->getFaces()[i * 2 + 1].mat = mat;
 		cube2->getFaces()[i * 2].mat = cube2->getFaces()[i * 2 + 1].mat = mat;
 	}

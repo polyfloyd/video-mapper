@@ -6,30 +6,24 @@
 
 class Material {
 public:
-	class Texture {
-	public:
-		static std::shared_ptr<Material::Texture> fromImage(const std::string &src);
-		static std::shared_ptr<Material::Texture> fromVideo(const std::string &src);
+	glm::mat3 rotation;
 
-		virtual ~Texture() = default;
+	static std::shared_ptr<Material> fromImage(const std::string &src);
+	static std::shared_ptr<Material> fromVideo(const std::string &src);
 
-		virtual int getWidth() const = 0;
+	virtual ~Material() = default;
 
-		virtual int getHeight() const = 0;
+	virtual int getWidth() const = 0;
 
-		virtual bool hasAlpha() const = 0;
+	virtual int getHeight() const = 0;
 
-		virtual bool isDirty() const = 0;
+	virtual bool hasAlpha() const = 0;
 
-		virtual void update() = 0;
+	virtual bool isDirty() const = 0;
 
-		virtual const uint8_t *getImage() const = 0;
-	};
+	virtual void update() = 0;
 
-public:
-	glm::vec3                color;
-	glm::mat3                rotation;
-	std::shared_ptr<Texture> tex = nullptr;
+	virtual const uint8_t *getImage() const = 0;
 };
 
 #endif /* _MATERIAL_HH */

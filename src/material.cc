@@ -1,14 +1,14 @@
 #include "material.hh"
 #include <CImg.h>
 
-class CImgTexture : public Material::Texture {
+class CImgMaterial : public Material {
 public:
 	std::unique_ptr<uint8_t> data;
 	int width, height;
 	bool alpha;
 
 public:
-	CImgTexture(const std::string &src) {
+	CImgMaterial(const std::string &src) {
 		cimg_library::CImg<uint8_t> img(src.c_str());
 
 		this->alpha  = img.spectrum() > 3;
@@ -50,6 +50,6 @@ public:
 };
 
 
-std::shared_ptr<Material::Texture> Material::Texture::fromImage(const std::string &src) {
-	return std::shared_ptr<Material::Texture>(new CImgTexture(src));
+std::shared_ptr<Material> Material::fromImage(const std::string &src) {
+	return std::shared_ptr<Material>(new CImgMaterial(src));
 }

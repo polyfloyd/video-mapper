@@ -2,7 +2,7 @@
 #include <mutex>
 #include <vlc/vlc.h>
 
-class VideoTexture : public Material::Texture {
+class VideoMaterial : public Material {
 protected:
 	std::vector<std::unique_ptr<uint8_t[]>> buffers;
 	std::mutex                              bufferLock;
@@ -16,7 +16,7 @@ protected:
 	int  width, height;
 
 public:
-	VideoTexture(const std::string &src) {
+	VideoMaterial(const std::string &src) {
 		static char const *vlcArgv[] = {
 			"--intf", "dummy",
 			"--no-audio",
@@ -58,7 +58,7 @@ public:
 		// libvlc_video_get_size() will fail with some inputs. This is a little
 		// more complex but more reliable.
 		auto sizeInitializer = [](const struct libvlc_event_t *event, void *userp) {
-			VideoTexture *self = static_cast<VideoTexture*>(userp);
+			VideoMaterial *self = static_cast<VideoMaterial*>(userp);
 			unsigned w, h;
 			if (libvlc_video_get_size(self->mediaPlayer, 0, &w, &h) == 0) {
 				self->width  = w;
@@ -84,20 +84,20 @@ public:
 		libvlc_video_set_format(this->mediaPlayer, "RGBA", this->width, this->height, this->width * 4);
 
 		auto lockCallback = [](void *data, void **pixels) {
-			VideoTexture *self = static_cast<VideoTexture*>(data);
+			VideoMaterial *self = static_cast<VideoMaterial*>(data);
 			int nextBuffer = (self->bufferSelect + 1) % self->buffers.size();
 			*pixels = self->buffers[nextBuffer].get();
 			return (void*)nullptr;
 		};
 		auto unlockCallback = [](void *data, void *id, void *const *pixels) { };
 		auto displayCallback = [](void *data, void *id) {
-			VideoTexture *self = static_cast<VideoTexture*>(data);
+			VideoMaterial *self = static_cast<VideoMaterial*>(data);
 			self->shouldSwap = true;
 		};
 		libvlc_video_set_callbacks(this->mediaPlayer, lockCallback, unlockCallback, displayCallback, this);
 	};
 
-	~VideoTexture() {
+	~VideoMaterial() {
 		libvlc_media_release(this->media);
 		libvlc_media_player_release(this->mediaPlayer);
 	}
@@ -134,6 +134,6 @@ public:
 };
 
 
-std::shared_ptr<Material::Texture> Material::Texture::fromVideo(const std::string &src) {
-	return std::shared_ptr<Material::Texture>(new VideoTexture(src));
+std::shared_ptr<Material> Material::fromVideo(const std::string &src) {
+	return std::shared_ptr<Material>(new VideoMaterial(src));
 }
