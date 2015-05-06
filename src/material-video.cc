@@ -35,10 +35,25 @@ public:
 			vlc = libvlc_new(sizeof(vlcArgv) / sizeof(*vlcArgv), vlcArgv);
 		}
 
-		this->media       = libvlc_media_new_path(vlc, src.c_str());
-		this->mediaPlayer = libvlc_media_player_new_from_media(this->media);
+		static const std::regex uriRegex("^([^:]+)://(.*)$", std::regex_constants::extended);
+		std::smatch match;
+		bool matches = std::regex_match(src, match, uriRegex);
+		if (!matches || match[1] == "file") {
+			std::string s = matches ? match[2].str() : src;
+			this->media = libvlc_media_new_path(vlc, s.c_str());
+		} else {
+			this->media = libvlc_media_new_location(vlc, src.c_str());
+		}
+
+		if (!this->media) {
+			fatalf("Unable create media from \"%s\"", src.c_str());
+		}
 		libvlc_media_parse(this->media);
 		libvlc_media_add_option(this->media, "input-repeat=-1");
+		this->mediaPlayer = libvlc_media_player_new_from_media(this->media);
+		if (!this->mediaPlayer) {
+			fatalf("Unable create media player from \"%s\"", src.c_str());
+		}
 
 		unsigned w, h;
 		if (libvlc_video_get_size(this->mediaPlayer, 0, &w, &h) != 0) {
