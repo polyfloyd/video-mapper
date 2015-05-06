@@ -48,19 +48,34 @@ public:
 		if (!this->media) {
 			fatalf("Unable create media from \"%s\"", src.c_str());
 		}
-		libvlc_media_parse(this->media);
 		libvlc_media_add_option(this->media, "input-repeat=-1");
 		this->mediaPlayer = libvlc_media_player_new_from_media(this->media);
 		if (!this->mediaPlayer) {
 			fatalf("Unable create media player from \"%s\"", src.c_str());
 		}
 
-		unsigned w, h;
-		if (libvlc_video_get_size(this->mediaPlayer, 0, &w, &h) != 0) {
-			fatalf("Video 0 does not exist");
-		}
-		this->width  = w;
-		this->height = h;
+		// Using libvlc_media_parse() and then getting the size using
+		// libvlc_video_get_size() will fail with some inputs. This is a little
+		// more complex but more reliable.
+		auto sizeInitializer = [](const struct libvlc_event_t *event, void *userp) {
+			VideoTexture *self = static_cast<VideoTexture*>(userp);
+			unsigned w, h;
+			if (libvlc_video_get_size(self->mediaPlayer, 0, &w, &h) == 0) {
+				self->width  = w;
+				self->height = h;
+				self->bufferLock.unlock();
+			}
+		};
+		// A condition variable would be more applicable. But this will suffice.
+		this->bufferLock.lock();
+		libvlc_event_manager_t *mediaEventMan = libvlc_media_event_manager(this->media);
+		libvlc_event_attach(mediaEventMan, libvlc_MediaMetaChanged, sizeInitializer, this);
+
+		libvlc_media_player_play(this->mediaPlayer);
+
+		this->bufferLock.lock();
+		this->bufferLock.unlock();
+		libvlc_event_detach(mediaEventMan, libvlc_MediaMetaChanged, sizeInitializer, this);
 
 		this->bufferSelect = 0;
 		for (int i = 0; i < 2; i++) {
@@ -80,8 +95,6 @@ public:
 			self->shouldSwap = true;
 		};
 		libvlc_video_set_callbacks(this->mediaPlayer, lockCallback, unlockCallback, displayCallback, this);
-
-		libvlc_media_player_play(this->mediaPlayer);
 	};
 
 	~VideoTexture() {
