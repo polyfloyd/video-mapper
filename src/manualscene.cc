@@ -29,14 +29,16 @@ void ManualScene::update() {
 			-(cursorPosY / windowHeight * 2 - 1)
 		);
 		if (!this->draggedVertex) {
-			for (auto &shape : this->getShapes()) {
-				for (auto &vert : *shape->getVertices()) {
-					if (glm::distance(cursor, vert.xy()) < 0.1f) {
-						this->draggedVertex = &vert;
-						break;
+			this->draggedVertex = [&]() {
+				for (auto &shape : this->getShapes()) {
+					for (auto &vert : *shape->getVertices()) {
+						if (glm::distance(cursor, vert.xy()) < 0.1f) {
+							return &vert;
+						}
 					}
 				}
-			}
+				return (glm::vec3*)nullptr;
+			}();
 		}
 		if (this->draggedVertex) {
 			this->draggedVertex->x = cursor.x;
