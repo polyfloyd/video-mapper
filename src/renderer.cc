@@ -56,6 +56,25 @@ OpenGLRenderer::OpenGLRenderer(std::function<GLFWmonitor*(std::vector<GLFWmonito
 		fatalf("Could not initialize GLEW");
 	}
 
+	glfwSetKeyCallback(this->window, [](GLFWwindow *win, int key, int scancode, int action, int mods) {
+		OpenGLRenderer *self = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(win));
+		for (auto &cb : self->keyCBs) {
+			cb(win, key, scancode, action, mods);
+		}
+	});
+	glfwSetMouseButtonCallback(this->window, [](GLFWwindow *win, int button, int action, int mods) {
+		OpenGLRenderer *self = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(win));
+		for (auto &cb : self->mouseButtonCBs) {
+			cb(win, button, action, mods);
+		}
+	});
+	glfwSetCursorPosCallback(this->window, [](GLFWwindow *win, double x, double y) {
+		OpenGLRenderer *self = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(win));
+		for (auto &cb : self->mouseMoveCBs) {
+			cb(win, x, y);
+		}
+	});
+
 	debugf("GLFW Version:        %s", glfwGetVersionString());
 	debugf("GLEW Version:        %s", glewGetString(GLEW_VERSION));
 	debugf("OpenGL Version:      %s", glGetString(GL_VERSION));
