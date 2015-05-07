@@ -2,6 +2,42 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+ManualScene::ManualScene(OpenGLRenderer *renderer) {
+	this->renderer = renderer;
+
+	this->renderer->addMouseButtonCallback([&](GLFWwindow *win, int button, int action, int mods){
+		if (button != GLFW_MOUSE_BUTTON_1) {
+			return;
+		}
+
+		this->dragging = action == GLFW_PRESS;
+		if (action == GLFW_PRESS) {
+			this->selectedVertex = nullptr;
+		}
+
+		if (this->dragging && !this->selectedVertex) {
+			this->selectVertex();
+		}
+	});
+
+	this->renderer->addMouseMoveCallback([&](GLFWwindow *win, double x, double y){
+		this->cursor = glm::vec2(
+			(x / this->renderer->getWindowSize().x  * 2 - 1) * this->renderer->getAspectRatio(),
+			-(y / this->renderer->getWindowSize().y * 2 - 1)
+		);
+
+		if (this->dragging) {
+			if (!this->selectedVertex) {
+				this->selectVertex();
+			}
+			if (this->selectedVertex) {
+				this->selectedVertex->x = this->cursor.x;
+				this->selectedVertex->y = this->cursor.y;
+			}
+		}
+	});
+}
+
 void ManualScene::addShape(std::unique_ptr<Shape> &shape) {
 	glm::mat4 model =
 		glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -10)) *
@@ -18,33 +54,15 @@ void ManualScene::addShape(std::unique_ptr<Shape> &shape) {
 	Scene::addShape(shape);
 }
 
-void ManualScene::update() {
-	if (glfwGetMouseButton(this->renderer->getWindow(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
-		int windowWidth, windowHeight;
-		glfwGetWindowSize(this->renderer->getWindow(), &windowWidth, &windowHeight);
-		double cursorPosX, cursorPosY;
-		glfwGetCursorPos(this->renderer->getWindow(), &cursorPosX, &cursorPosY);
-		glm::vec2 cursor(
-			(cursorPosX / windowWidth  * 2 - 1) * renderer->getAspectRatio(),
-			-(cursorPosY / windowHeight * 2 - 1)
-		);
-		if (!this->draggedVertex) {
-			this->draggedVertex = [&]() {
-				for (auto &shape : this->getShapes()) {
-					for (auto &vert : *shape->getVertices()) {
-						if (glm::distance(cursor, vert.xy()) < 0.1f) {
-							return &vert;
-						}
-					}
+void ManualScene::selectVertex() {
+	this->selectedVertex = [&]() {
+		for (auto &shape : this->getShapes()) {
+			for (auto &vert : *shape->getVertices()) {
+				if (glm::distance(this->cursor, vert.xy()) < 0.1f) {
+					return &vert;
 				}
-				return (glm::vec3*)nullptr;
-			}();
+			}
 		}
-		if (this->draggedVertex) {
-			this->draggedVertex->x = cursor.x;
-			this->draggedVertex->y = cursor.y;
-		}
-	} else {
-		this->draggedVertex = nullptr;
-	}
+		return (glm::vec3*)nullptr;
+	}();
 }

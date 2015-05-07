@@ -11,15 +11,18 @@
 class ManualScene : public Scene {
 protected:
 	OpenGLRenderer *renderer;
-	glm::vec3      *draggedVertex;
+	glm::vec3      *selectedVertex = nullptr;
+	glm::vec2       cursor;
+	bool            dragging = false;
 
 public:
-	ManualScene(OpenGLRenderer *renderer)
-		: renderer(renderer), draggedVertex(nullptr) {};
+	ManualScene(OpenGLRenderer *renderer);
 
 	void addShape(std::unique_ptr<Shape> &shape);
 
-	void update();
+	void update() { };
+
+	void selectVertex();
 };
 
 #endif /* _MANUALSCENE_HH */

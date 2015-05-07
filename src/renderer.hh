@@ -20,6 +20,7 @@ class OpenGLRenderer : public Renderer {
 protected:
 	GLFWwindow  *window;
 	GLFWmonitor *monitor;
+	glm::vec2                   windowSize;
 	std::map<Material*, GLuint> textures;
 
 	std::list<std::function<void(GLFWwindow*, int, int, int, int)>> keyCBs;
@@ -38,6 +39,10 @@ public:
 	bool isAlive() const;
 
 	float getAspectRatio() const;
+
+	const glm::vec2 &getWindowSize() {
+		return this->windowSize;
+	}
 
 	GLFWwindow *getWindow() const {
 		return this->window;

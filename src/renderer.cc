@@ -45,6 +45,8 @@ OpenGLRenderer::OpenGLRenderer(std::function<GLFWmonitor*(std::vector<GLFWmonito
 	debugf("Using monitor \"%s\"", glfwGetMonitorName(this->monitor));
 
 	const GLFWvidmode *vidmode = glfwGetVideoMode(this->monitor);
+	this->windowSize.x = vidmode->width;
+	this->windowSize.y = vidmode->height;
 	this->window = glfwCreateWindow(vidmode->width, vidmode->height, "Projection", this->monitor, nullptr);
 	if (!this->window) {
 		fatalf("Failed to open window");
@@ -56,6 +58,11 @@ OpenGLRenderer::OpenGLRenderer(std::function<GLFWmonitor*(std::vector<GLFWmonito
 		fatalf("Could not initialize GLEW");
 	}
 
+	glfwSetWindowSizeCallback(this->window, [](GLFWwindow *win, int w, int h) {
+		OpenGLRenderer *self = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(win));
+		self->windowSize.x = w;
+		self->windowSize.y = h;
+	});
 	glfwSetKeyCallback(this->window, [](GLFWwindow *win, int key, int scancode, int action, int mods) {
 		OpenGLRenderer *self = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(win));
 		for (auto &cb : self->keyCBs) {
@@ -214,6 +221,5 @@ bool OpenGLRenderer::isAlive() const {
 }
 
 float OpenGLRenderer::getAspectRatio() const {
-	const GLFWvidmode *vidmode = glfwGetVideoMode(this->monitor);
-	return vidmode->width / (float)vidmode->height;
+	return this->windowSize.x / this->windowSize.y;
 }
