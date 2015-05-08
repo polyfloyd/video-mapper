@@ -14,6 +14,8 @@ public:
 		glm::vec2  tex;
 
 	public:
+		Vertex() = default;
+
 		Vertex(glm::vec3 *vec);
 
 		Vertex(glm::vec3 *vec, float u, float v);

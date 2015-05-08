@@ -30,69 +30,21 @@ Cube::Cube(float size) {
 		));
 	}
 
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b000], 1, 0),
-		Vertex(&this->vertices[0b010], 0, 0),
-		Vertex(&this->vertices[0b100], 1, 1)
-	));
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b010], 0, 0),
-		Vertex(&this->vertices[0b100], 1, 1),
-		Vertex(&this->vertices[0b110], 0, 1)
-	));
-
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b000], 0, 0),
-		Vertex(&this->vertices[0b010], 0, 0),
-		Vertex(&this->vertices[0b001], 0, 0)
-	));
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b010], 0, 0),
-		Vertex(&this->vertices[0b001], 0, 0),
-		Vertex(&this->vertices[0b011], 0, 0)
-	));
-
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b000], 0, 0),
-		Vertex(&this->vertices[0b100], 0, 0),
-		Vertex(&this->vertices[0b001], 0, 0)
-	));
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b100], 0, 0),
-		Vertex(&this->vertices[0b001], 0, 0),
-		Vertex(&this->vertices[0b101], 0, 0)
-	));
-
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b001], 0, 0),
-		Vertex(&this->vertices[0b011], 0, 0),
-		Vertex(&this->vertices[0b101], 0, 0)
-	));
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b011], 0, 0),
-		Vertex(&this->vertices[0b101], 0, 0),
-		Vertex(&this->vertices[0b111], 0, 0)
-	));
-
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b100], 1, 0),
-		Vertex(&this->vertices[0b110], 0, 0),
-		Vertex(&this->vertices[0b101], 1, 1)
-	));
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b110], 0, 0),
-		Vertex(&this->vertices[0b101], 1, 1),
-		Vertex(&this->vertices[0b111], 0, 1)
-	));
-
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b010], 1, 0),
-		Vertex(&this->vertices[0b110], 1, 1),
-		Vertex(&this->vertices[0b011], 0, 0)
-	));
-	this->surfaces.push_back(Face(
-		Vertex(&this->vertices[0b110], 1, 1),
-		Vertex(&this->vertices[0b011], 0, 0),
-		Vertex(&this->vertices[0b111], 0, 1)
-	));
+	for (int s = 0; s < 2; s++) {
+		for (int b = 0; b < 3; b++) {
+			Vertex verts[4];
+			for (int u = 0; u < 2; u++) {
+				for (int v = 0; v < 2; v++) {
+					int corner = u<<1 | v;
+					int i =
+						(corner<<b & 0b111) |
+						(corner<<b >> 3) |
+						(s << (b+2) % 3);
+					verts[corner] = Vertex(&this->vertices[i], -u, v);
+				}
+			}
+			this->surfaces.push_back(Face(verts[0], verts[1], verts[2]));
+			this->surfaces.push_back(Face(verts[1], verts[2], verts[3]));
+		}
+	}
 }
