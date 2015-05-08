@@ -30,12 +30,12 @@ VideoMaterial::VideoMaterial(const std::string &src) {
 	}
 
 	if (!this->media) {
-		fatalf("Unable create media from \"%s\"", src.c_str());
+		throw std::runtime_error("Unable create media from \""+src+"\"");
 	}
 	libvlc_media_add_option(this->media, "input-repeat=-1");
 	this->mediaPlayer = libvlc_media_player_new_from_media(this->media);
 	if (!this->mediaPlayer) {
-		fatalf("Unable create media player from \"%s\"", src.c_str());
+		throw std::runtime_error("Unable create media player from \""+src+"\"");
 	}
 
 	// Using libvlc_media_parse() and then getting the size using
