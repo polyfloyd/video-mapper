@@ -41,25 +41,11 @@ void populateScene(Scene *scene) {
 }
 
 int main(int argc, char **argv) {
-	bool wireframe         = false;
-	bool wireframeDebounce = false;
-
 	OpenGLRenderer renderer(selectMonitor);
 	ManualScene scene(&renderer);
 	populateScene(&scene);
 
 	while (renderer.isAlive()) {
-		if (glfwGetKey(renderer.getWindow(), GLFW_KEY_W) == GLFW_PRESS) {
-			if (!wireframeDebounce) {
-				wireframe = !wireframe;
-				glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
-				wireframeDebounce = true;
-			}
-		}
-		if (glfwGetKey(renderer.getWindow(), GLFW_KEY_W) == GLFW_RELEASE) {
-			wireframeDebounce = false;
-		}
-
 		scene.update();
 		renderer.render(&scene);
 	}

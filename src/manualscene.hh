@@ -14,6 +14,7 @@ protected:
 	glm::vec3      *selectedVertex = nullptr;
 	glm::vec2       cursor;
 	bool            dragging = false;
+	bool            wireframe = false;
 
 public:
 	ManualScene(OpenGLRenderer *renderer);

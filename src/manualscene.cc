@@ -36,6 +36,16 @@ ManualScene::ManualScene(OpenGLRenderer *renderer) {
 			}
 		}
 	});
+
+	this->renderer->addKeyCallback([&](GLFWwindow *win, int key, int scancode, int action, int mods) {
+		if (key == GLFW_KEY_W) {
+			if (action == GLFW_RELEASE) {
+				this->wireframe = !this->wireframe;
+			}
+			glLineWidth(this->wireframe ? 4 : 1);
+			glPolygonMode(GL_FRONT_AND_BACK, this->wireframe ? GL_LINE : GL_FILL);
+		}
+	});
 }
 
 void ManualScene::addShape(std::unique_ptr<Shape> &shape) {
