@@ -3,7 +3,6 @@
 #include "common.hh"
 #include "manualscene.hh"
 #include "material/material.hh"
-#include "material/imagematerial.hh"
 #include "material/mediamaterial.hh"
 #include "renderer.hh"
 #include "scene.hh"
@@ -30,7 +29,7 @@ void populateScene(Scene *scene) {
 	auto cube1 = std::unique_ptr<Shape>(new Cube(1.0f));
 	auto cube2 = std::unique_ptr<Shape>(new Cube(1.0f));
 
-	auto mat = std::shared_ptr<Material>(new ImageMaterial("res/test.png"));
+	auto mat = std::shared_ptr<Material>(new MediaMaterial("res/test.png"));
 	for (int i = 0; i < 6; i++) {
 		cube1->getFaces()->at(i * 2).mat = cube1->getFaces()->at(i * 2 + 1).mat = mat;
 		cube2->getFaces()->at(i * 2).mat = cube2->getFaces()->at(i * 2 + 1).mat = mat;
