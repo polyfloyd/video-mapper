@@ -1,6 +1,6 @@
-#include "videomaterial.hh"
+#include "mediamaterial.hh"
 
-VideoMaterial::VideoMaterial(const std::string &src) {
+MediaMaterial::MediaMaterial(const std::string &src) {
 	static char const *vlcArgv[] = {
 		"--intf", "dummy",
 		"--no-audio",
@@ -42,7 +42,7 @@ VideoMaterial::VideoMaterial(const std::string &src) {
 	// libvlc_video_get_size() will fail with some inputs. This is a little
 	// more complex but more reliable.
 	auto sizeInitializer = [](const struct libvlc_event_t *event, void *userp) {
-		VideoMaterial *self = static_cast<VideoMaterial*>(userp);
+		MediaMaterial *self = static_cast<MediaMaterial*>(userp);
 		unsigned w, h;
 		if (libvlc_video_get_size(self->mediaPlayer, 0, &w, &h) == 0) {
 			self->width  = w;
@@ -68,45 +68,45 @@ VideoMaterial::VideoMaterial(const std::string &src) {
 	libvlc_video_set_format(this->mediaPlayer, "RGBA", this->width, this->height, this->width * 4);
 
 	auto lockCallback = [](void *data, void **pixels) {
-		VideoMaterial *self = static_cast<VideoMaterial*>(data);
+		MediaMaterial *self = static_cast<MediaMaterial*>(data);
 		int nextBuffer = (self->bufferSelect + 1) % self->buffers.size();
 		*pixels = self->buffers[nextBuffer].get();
 		return (void*)nullptr;
 	};
 	auto unlockCallback = [](void *data, void *id, void *const *pixels) { };
 	auto displayCallback = [](void *data, void *id) {
-		VideoMaterial *self = static_cast<VideoMaterial*>(data);
+		MediaMaterial *self = static_cast<MediaMaterial*>(data);
 		self->shouldSwap = true;
 	};
 	libvlc_video_set_callbacks(this->mediaPlayer, lockCallback, unlockCallback, displayCallback, this);
 };
 
-VideoMaterial::~VideoMaterial() {
+MediaMaterial::~MediaMaterial() {
 	libvlc_media_release(this->media);
 	libvlc_media_player_release(this->mediaPlayer);
 }
 
-int VideoMaterial::getWidth() const {
+int MediaMaterial::getWidth() const {
 	return this->width;
 };
 
-int VideoMaterial::getHeight() const {
+int MediaMaterial::getHeight() const {
 	return this->height;
 };
 
-bool VideoMaterial::hasAlpha() const {
+bool MediaMaterial::hasAlpha() const {
 	return true;
 };
 
-bool VideoMaterial::isDirty() const {
+bool MediaMaterial::isDirty() const {
 	return this->dirty;
 }
 
-const uint8_t *VideoMaterial::getImage() const {
+const uint8_t *MediaMaterial::getImage() const {
 	return this->buffers[this->bufferSelect].get();
 };
 
-void VideoMaterial::update() {
+void MediaMaterial::update() {
 	this->dirty = false;
 	if (this->shouldSwap) {
 		std::lock_guard<std::mutex> _(this->bufferLock);

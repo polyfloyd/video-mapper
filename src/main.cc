@@ -4,7 +4,7 @@
 #include "manualscene.hh"
 #include "material/material.hh"
 #include "material/imagematerial.hh"
-#include "material/videomaterial.hh"
+#include "material/mediamaterial.hh"
 #include "renderer.hh"
 #include "scene.hh"
 #include "shape.hh"
