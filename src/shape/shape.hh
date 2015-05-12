@@ -33,24 +33,4 @@ public:
 	virtual std::vector<Shape::Face> *getFaces() = 0;
 };
 
-
-class Cube : public Shape {
-private:
-	std::vector<glm::vec3> vertices;
-	std::vector<Face>      surfaces;
-
-public:
-	Cube(float size);
-
-	Cube(const Cube &cube) = default;
-
-	std::vector<glm::vec3> *getVertices() {
-		return &this->vertices;
-	}
-
-	std::vector<Shape::Face> *getFaces() {
-		return &this->surfaces;
-	}
-};
-
 #endif /* _SHAPE_HH */

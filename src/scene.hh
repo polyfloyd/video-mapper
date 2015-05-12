@@ -2,7 +2,7 @@
 #define _SCENE_HH
 
 #include "common.hh"
-#include "shape.hh"
+#include "shape/shape.hh"
 
 /**
  * An implementation of the Scene transforms its shapes to match real-world

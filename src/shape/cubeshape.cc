@@ -1,17 +1,6 @@
-#include "shape.hh"
+#include "cubeshape.hh"
 
-Shape::Vertex::Vertex(glm::vec3 *vec, float u, float v) {
-	this->vec = vec;
-	this->tex = glm::vec2(u, v);
-}
-
-Shape::Face::Face(const Vertex &a, const Vertex &b, const Vertex &c) {
-	this->v[0] = a;
-	this->v[1] = b;
-	this->v[2] = c;
-}
-
-Cube::Cube(float size) {
+CubeShape::CubeShape(float size) {
 	for (int i = 0; i < 8; i++) {
 		this->vertices.push_back(glm::vec3(
 			size * (i & 0x1 ? 1 : -1) / 2,
