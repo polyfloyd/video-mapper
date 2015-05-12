@@ -32,8 +32,8 @@ void populateScene(Scene *scene) {
 
 	auto mat = std::shared_ptr<Material>(new ImageMaterial("res/test.png"));
 	for (int i = 0; i < 6; i++) {
-		cube1->getFaces()[i * 2].mat = cube1->getFaces()[i * 2 + 1].mat = mat;
-		cube2->getFaces()[i * 2].mat = cube2->getFaces()[i * 2 + 1].mat = mat;
+		cube1->getFaces()->at(i * 2).mat = cube1->getFaces()->at(i * 2 + 1).mat = mat;
+		cube2->getFaces()->at(i * 2).mat = cube2->getFaces()->at(i * 2 + 1).mat = mat;
 	}
 
 	scene->addShape(cube1);

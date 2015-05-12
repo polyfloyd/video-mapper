@@ -10,13 +10,10 @@ public:
 	class Vertex {
 	public:
 		glm::vec3 *vec;
-		glm::vec3  normal;
 		glm::vec2  tex;
 
 	public:
 		Vertex() = default;
-
-		Vertex(glm::vec3 *vec);
 
 		Vertex(glm::vec3 *vec, float u, float v);
 	};
@@ -24,18 +21,16 @@ public:
 	class Face {
 	public:
 		std::shared_ptr<Material> mat;
-		Vertex                    v[3] = { nullptr, nullptr, nullptr };
+		Vertex                    v[3];
 
 	public:
-		Face(glm::vec3 *a, glm::vec3 *b, glm::vec3 *c);
-
-		Face(Vertex a, Vertex b, Vertex c);
+		Face(const Vertex &a, const Vertex &b, const Vertex &c);
 	};
 
 public:
 	virtual std::vector<glm::vec3> *getVertices() = 0;
 
-	virtual std::vector<Shape::Face> &getFaces() = 0;
+	virtual std::vector<Shape::Face> *getFaces() = 0;
 };
 
 
@@ -53,8 +48,8 @@ public:
 		return &this->vertices;
 	}
 
-	std::vector<Shape::Face> &getFaces() {
-		return this->surfaces;
+	std::vector<Shape::Face> *getFaces() {
+		return &this->surfaces;
 	}
 };
 

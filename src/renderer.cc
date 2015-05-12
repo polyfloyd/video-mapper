@@ -141,7 +141,7 @@ void OpenGLRenderer::render(const Scene *scene) {
 	glBegin(GL_TRIANGLES);
 	for (auto &shape : scene->getShapes()) {
 
-		for (auto &face : shape->getFaces()) {
+		for (auto &face : *shape->getFaces()) {
 			if (face.mat) {
 				glEnd();
 
@@ -157,7 +157,6 @@ void OpenGLRenderer::render(const Scene *scene) {
 				glBegin(GL_TRIANGLES);
 			}
 			for (int i = 0; i < 3; i++) {
-				glNormalVec3(face.v[i].normal);
 				glTexCoordVec2(face.v[i].tex);
 				glVertexVec3(*face.v[i].vec);
 			}

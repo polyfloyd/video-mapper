@@ -1,24 +1,14 @@
 #include "shape.hh"
 
-Shape::Vertex::Vertex(glm::vec3 *vec) {
-	this->vec = vec;
-}
-
 Shape::Vertex::Vertex(glm::vec3 *vec, float u, float v) {
 	this->vec = vec;
 	this->tex = glm::vec2(u, v);
 }
 
-Shape::Face::Face(Vertex a, Vertex b, Vertex c) {
+Shape::Face::Face(const Vertex &a, const Vertex &b, const Vertex &c) {
 	this->v[0] = a;
 	this->v[1] = b;
 	this->v[2] = c;
-}
-
-Shape::Face::Face(glm::vec3 *a, glm::vec3 *b, glm::vec3 *c) {
-	this->v[0] = Vertex(a);
-	this->v[1] = Vertex(b);
-	this->v[2] = Vertex(c);
 }
 
 Cube::Cube(float size) {
