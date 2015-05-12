@@ -9,7 +9,7 @@ private:
 	std::vector<Face>      surfaces;
 
 public:
-	CubeShape(float size);
+	CubeShape();
 
 	CubeShape(const CubeShape &cube) = default;
 

@@ -26,8 +26,8 @@ GLFWmonitor *selectMonitor(std::vector<GLFWmonitor*> monitors) {
 }
 
 void populateScene(Scene *scene) {
-	auto cube1 = std::unique_ptr<Shape>(new CubeShape(1.0f));
-	auto cube2 = std::unique_ptr<Shape>(new CubeShape(1.0f));
+	auto cube1 = std::unique_ptr<Shape>(new CubeShape());
+	auto cube2 = std::unique_ptr<Shape>(new CubeShape());
 
 	auto mat = std::shared_ptr<Material>(new MediaMaterial("res/test.png"));
 	for (int i = 0; i < 6; i++) {

@@ -1,11 +1,11 @@
 #include "cubeshape.hh"
 
-CubeShape::CubeShape(float size) {
+CubeShape::CubeShape() {
 	for (int i = 0; i < 8; i++) {
 		this->vertices.push_back(glm::vec3(
-			size * (i & 0x1 ? 1 : -1) / 2,
-			size * (i & 0x2 ? 1 : -1) / 2,
-			size * (i & 0x4 ? 1 : -1) / 2
+			(i & 0x1 ? 1 : -1) / 2.0f,
+			(i & 0x2 ? 1 : -1) / 2.0f,
+			(i & 0x4 ? 1 : -1) / 2.0f
 		));
 	}
 
