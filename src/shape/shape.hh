@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include "common.hh"
 #include "material/material.hh"
+#include "renderable.hh"
 
 class Shape {
 public:
@@ -18,13 +19,19 @@ public:
 		Vertex(glm::vec3 *vec, float u, float v);
 	};
 
-	class Face {
+	class Face : public Renderable {
 	public:
 		std::shared_ptr<Material> mat;
 		Vertex                    v[3];
 
 	public:
 		Face(const Vertex &a, const Vertex &b, const Vertex &c);
+
+		Material *getMaterial() const;
+
+		const glm::vec3 &getVertex(int vertex) const;
+
+		const glm::vec2 &getTexCoord(int vertex) const;
 	};
 
 public:

@@ -130,38 +130,28 @@ OpenGLRenderer::~OpenGLRenderer() {
 	glfwTerminate();
 }
 
-void OpenGLRenderer::render(const Scene *scene) {
+void OpenGLRenderer::render(const std::list<Renderable*> &renderables) {
 	int fbWidth, fbHeight;
 	glfwGetFramebufferSize(this->window, &fbWidth, &fbHeight);
 	glViewport(0, 0, fbWidth, fbHeight);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	std::map<std::shared_ptr<Material>, bool> updatedTextures;
-
 	glBegin(GL_TRIANGLES);
-	for (auto &shape : scene->getShapes()) {
+	for (auto &renderable : renderables) {
+		Material *mat = renderable->getMaterial();
+		if (mat) {
+			glEnd();
 
-		for (auto &face : *shape->getFaces()) {
-			if (face.mat) {
-				glEnd();
+			GLuint tex = this->getCachedTexture(mat);
+			glBindTexture(GL_TEXTURE_2D, tex);
+			glActiveTexture(GL_TEXTURE0);
 
-				if (!updatedTextures[face.mat]) {
-					updatedTextures[face.mat] = true;
-					face.mat->update();
-				}
-
-				GLuint tex = this->getCachedTexture(face.mat);
-				glBindTexture(GL_TEXTURE_2D, tex);
-				glActiveTexture(GL_TEXTURE0);
-
-				glBegin(GL_TRIANGLES);
-			}
-			for (int i = 0; i < 3; i++) {
-				glTexCoordVec2(face.v[i].tex);
-				glVertexVec3(*face.v[i].vec);
-			}
+			glBegin(GL_TRIANGLES);
 		}
-
+		for (int i = 0; i < 3; i++) {
+			glTexCoordVec2(renderable->getTexCoord(i));
+			glVertexVec3(renderable->getVertex(i));
+		}
 	}
 	glEnd();
 
@@ -169,8 +159,8 @@ void OpenGLRenderer::render(const Scene *scene) {
 	glfwPollEvents();
 }
 
-GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material> tex) {
-	GLuint glTex = this->textures[tex.get()];
+GLuint OpenGLRenderer::getCachedTexture(Material *tex) {
+	GLuint glTex = this->textures[tex];
 	bool   init  = !glTex;
 
 	if (init) {
@@ -180,7 +170,7 @@ GLuint OpenGLRenderer::getCachedTexture(std::shared_ptr<Material> tex) {
 			tex->hasAlpha() ? "RGBA" : "RGB"
 		);
 		glGenTextures(1, &glTex);
-		this->textures[tex.get()] = glTex;
+		this->textures[tex] = glTex;
 		glBindTexture(GL_TEXTURE_2D, glTex);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

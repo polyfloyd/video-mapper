@@ -21,7 +21,7 @@ public:
 
 	void addShape(std::unique_ptr<Shape> &shape);
 
-	void update() { };
+	void update();
 
 	void selectVertex();
 };

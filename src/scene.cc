@@ -11,10 +11,12 @@ void Scene::removeShape(Shape *shape) {
 	});
 }
 
-const std::list<Shape*> Scene::getShapes() const {
-	std::list<Shape*> s;
+const std::list<Renderable*> Scene::getRenderables() const {
+	std::list<Renderable*> s;
 	for (auto &shape : this->shapes) {
-		s.push_back(shape.get());
+		for (auto &face : *shape->getFaces()) {
+			s.push_back(&face);
+		}
 	}
 	return s;
 }

@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
 
 	while (renderer.isAlive()) {
 		scene.update();
-		renderer.render(&scene);
+		renderer.render(scene.getRenderables());
 	}
 	debugf("Bye!");
 }

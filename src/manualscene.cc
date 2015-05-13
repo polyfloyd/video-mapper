@@ -64,9 +64,22 @@ void ManualScene::addShape(std::unique_ptr<Shape> &shape) {
 	Scene::addShape(shape);
 }
 
+void ManualScene::update() {
+	std::map<Material*, bool> updatedTextures;
+	for (auto &shape : this->shapes) {
+		for (auto &face : *shape->getFaces()) {
+			Material *mat = face.getMaterial();
+			if (!updatedTextures[mat]) {
+				updatedTextures[mat] = true;
+				mat->update();
+			}
+		}
+	}
+}
+
 void ManualScene::selectVertex() {
 	this->selectedVertex = [&]() {
-		for (auto &shape : this->getShapes()) {
+		for (auto &shape : this->shapes) {
 			for (auto &vert : *shape->getVertices()) {
 				if (glm::distance(this->cursor, vert.xy()) < 0.1f) {
 					return &vert;

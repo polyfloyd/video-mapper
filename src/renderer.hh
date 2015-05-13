@@ -3,13 +3,14 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "scene.hh"
+#include "material/material.hh"
+#include "renderable.hh"
 
 class Renderer {
 public:
 	virtual ~Renderer() = default;
 
-	virtual void render(const Scene *scene) = 0;
+	virtual void render(const std::list<Renderable*> &renderables) = 0;
 
 	virtual bool isAlive() const = 0;
 
@@ -32,9 +33,9 @@ public:
 
 	~OpenGLRenderer();
 
-	void render(const Scene *scene);
+	void render(const std::list<Renderable*> &renderables);
 
-	GLuint getCachedTexture(std::shared_ptr<Material> tex);
+	GLuint getCachedTexture(Material *tex);
 
 	bool isAlive() const;
 

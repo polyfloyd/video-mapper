@@ -15,6 +15,8 @@ protected:
 public:
 	virtual void update() = 0;
 
+	virtual const std::list<Renderable*> getRenderables() const;
+
 	virtual void addShape(std::unique_ptr<Shape> &shape) {
 		this->shapes.push_back(std::move(shape));
 	}
@@ -22,8 +24,6 @@ public:
 	virtual void removeShape(Shape *shape);
 
 	void addShape(Shape *shape);
-
-	const std::list<Shape*> getShapes() const;
 };
 
 #endif /* _SCENE_HH */
