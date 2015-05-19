@@ -1,8 +1,6 @@
 #ifndef _MANUALSCENE_HH
 #define _MANUALSCENE_HH
 
-#define GLM_SWIZZLE
-
 #include "common.hh"
 #include <glm/glm.hpp>
 #include "scene.hh"

@@ -77,7 +77,8 @@ CXXINCLUDES := \
 COMMONFLAGS := -Wfatal-errors
 CXXFLAGS    := \
 	$(shell pkg-config --cflags $(LIBS)) \
-	-std=c++0x
+	-std=c++0x \
+	-DGLM_SWIZZLE
 LDFLAGS     := \
 	$(shell pkg-config --libs $(LIBS)) \
 	-lpthread \
