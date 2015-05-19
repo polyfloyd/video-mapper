@@ -9,10 +9,14 @@
 class ManualScene : public Scene {
 protected:
 	OpenGLRenderer *renderer;
+	Shape          *selectedShape = nullptr;
 	glm::vec3      *selectedVertex = nullptr;
 	glm::vec2       cursor;
 	bool            dragging = false;
 	bool            wireframe = false;
+
+protected:
+	void updateSelection();
 
 public:
 	ManualScene(OpenGLRenderer *renderer);
@@ -20,8 +24,6 @@ public:
 	void addShape(std::unique_ptr<Shape> &shape);
 
 	void update();
-
-	void selectVertex();
 };
 
 #endif /* _MANUALSCENE_HH */

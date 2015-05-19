@@ -16,7 +16,7 @@ ManualScene::ManualScene(OpenGLRenderer *renderer) {
 		}
 
 		if (this->dragging && !this->selectedVertex) {
-			this->selectVertex();
+			this->updateSelection();
 		}
 	});
 
@@ -28,7 +28,7 @@ ManualScene::ManualScene(OpenGLRenderer *renderer) {
 
 		if (this->dragging) {
 			if (!this->selectedVertex) {
-				this->selectVertex();
+				this->updateSelection();
 			}
 			if (this->selectedVertex) {
 				this->selectedVertex->x = this->cursor.x;
@@ -77,15 +77,14 @@ void ManualScene::update() {
 	}
 }
 
-void ManualScene::selectVertex() {
-	this->selectedVertex = [&]() {
-		for (auto &shape : this->shapes) {
-			for (auto &vert : *shape->getVertices()) {
-				if (glm::distance(this->cursor, vert.xy()) < 0.1f) {
-					return &vert;
-				}
+void ManualScene::updateSelection() {
+	for (auto &shape : this->shapes) {
+		for (auto &vert : *shape->getVertices()) {
+			if (glm::distance(this->cursor, vert.xy()) < 0.1f) {
+				this->selectedShape  = shape.get();
+				this->selectedVertex = &vert;
+				return;
 			}
 		}
-		return (glm::vec3*)nullptr;
-	}();
+	}
 }
