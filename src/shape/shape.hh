@@ -16,7 +16,10 @@ public:
 	public:
 		Vertex() = default;
 
-		Vertex(glm::vec3 *vec, float u, float v);
+		Vertex(glm::vec3 *vec, glm::vec2 tex);
+
+		Vertex(glm::vec3 *vec, float u, float v)
+			: Vertex(vec, glm::vec2(u, v)) { };
 	};
 
 	class Face : public Renderable {

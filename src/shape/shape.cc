@@ -1,8 +1,8 @@
 #include "shape.hh"
 
-Shape::Vertex::Vertex(glm::vec3 *vec, float u, float v) {
+Shape::Vertex::Vertex(glm::vec3 *vec, glm::vec2 tex) {
 	this->vec = vec;
-	this->tex = glm::vec2(u, v);
+	this->tex = tex;
 }
 
 Shape::Face::Face(const Vertex &a, const Vertex &b, const Vertex &c) {
