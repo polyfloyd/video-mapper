@@ -1,6 +1,8 @@
 #include "shape.hh"
 
 Shape::Vertex::Vertex(glm::vec3 *vec, glm::vec2 tex) {
+	assert(vec);
+
 	this->vec = vec;
 	this->tex = tex;
 }

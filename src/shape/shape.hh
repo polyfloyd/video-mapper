@@ -25,7 +25,7 @@ public:
 	class Face : public Renderable {
 	public:
 		std::shared_ptr<Material> mat;
-		Vertex                    v[3];
+		std::array<Vertex, 3>     v;
 
 	public:
 		Face(const Vertex &a, const Vertex &b, const Vertex &c);
