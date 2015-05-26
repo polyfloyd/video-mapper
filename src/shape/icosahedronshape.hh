@@ -9,7 +9,9 @@ private:
 	std::vector<Face>      surfaces;
 
 public:
-	IcosahedronShape();
+	IcosahedronShape() : IcosahedronShape(0) { };
+
+	IcosahedronShape(int tessLevel);
 
 	IcosahedronShape(const IcosahedronShape &cube) = default;
 
@@ -20,6 +22,13 @@ public:
 	std::vector<Shape::Face> *getFaces() {
 		return &this->surfaces;
 	}
+
+protected:
+	/**
+	 * Splits all polygons into 4 smaller polygons. Called by the constructor.
+	 */
+	void tessellate(int tessLevel, std::map<std::array<glm::vec3*, 2>, glm::vec3*> *existingVerts);
+
 };
 
 #endif /* _ICOSAHEDRONSHAPE_HH */
