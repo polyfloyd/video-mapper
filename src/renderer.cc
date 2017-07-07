@@ -92,7 +92,7 @@ OpenGLRenderer::OpenGLRenderer(std::function<GLFWmonitor*(std::vector<GLFWmonito
 	if (GLEW_ARB_debug_output) {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
-		glDebugMessageCallbackARB([](GLenum src, GLenum type, GLuint id, GLenum sev, GLsizei len, const GLchar* cmsg, GLvoid* userp) {
+		glDebugMessageCallbackARB([](unsigned int src, unsigned int type, unsigned int id, unsigned int sev, int len, const char *cmsg, const void *userp) {
 			std::string msg(cmsg);
 			if (msg[len - 1] == '\n') {
 				msg = msg.substr(0, len - 1);
